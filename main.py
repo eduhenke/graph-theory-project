@@ -56,18 +56,51 @@ class Graph:
                 return False
         return True
 
-    def transitiveClosure(self, v, reachable):
+    def transitiveClosureUtil(self, v, reachable):
         reachable.add(v)
         for u in self.adjacents(v):
             if u not in reachable:
-                reachable.union(self.transitiveClosure(u, reachable))
+                reachable.union(self.transitiveClosureUtil(u, reachable))
         return reachable
+
+    def transitiveClosure(self, v):
+        return self.transitiveClosureUtil(v, set())
 
     def isConnected(self):
         for v in self.Vertices:
-            if len(self.adjacents(v)) == 0:
+            if self.transitiveClosure(v) != self.Vertices:
                 return False
         return True
+    
+    def hasCycleUtil(self, cameFrom, v, C):
+        C.add(v)
+        result = False
+        for u in self.adjacents(v):
+            if u == cameFrom:
+                pass
+            elif u in C:
+                result = True
+            else:
+                result |= self.hasCycleUtil(v, u, C)
+        return result
+
+    def hasCycle(self):
+        result = False
+        graph = self
+        Marked = set()
+        while graph.Vertices != set():
+            v = graph.anyVertex()
+            Marked.add(v)
+            for u in graph.adjacents(v):
+                result |= self.hasCycleUtil(v, u, Marked)
+            RemainingVertices = self.Vertices - Marked
+            graph = Graph(RemainingVertices, self.Edges)
+        return result
+
+    def isTree(self):
+        if not self.isConnected():
+            return False
+        return self.hasCycle()
 
 if __name__ == "__main__":
     g = Graph(set(), set())
@@ -77,13 +110,17 @@ if __name__ == "__main__":
     g.addVertex(4)
     g.addVertex(5)
     g.connect(1, 2)
-    g.connect(2, 3)
+    # g.connect(2, 3)
     g.connect(4, 3)
-    print(g)
-    print(g.successors(2), g.antecessors(2), g.adjacents(2))
-    print(g.transitiveClosure(2, set()))
+    g.connect(3, 5)
+    g.connect(5, 4)
+    # print(g)
+    # print(g.successors(2), g.antecessors(2), g.adjacents(2))
+    print(g.transitiveClosure(2))
+    print(g.hasCycle())
     print(g.isConnected())
-    g.removeVertex(2)
-    g.removeVertex(3)
-    g.disconnect(2, 3)
-    print(g)
+    print(g.isTree())
+    # g.removeVertex(2)
+    # g.removeVertex(3)
+    # g.disconnect(2, 3)
+    # print(g)
