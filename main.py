@@ -74,43 +74,35 @@ class Graph:
     
     def hasCycleUtil(self, cameFrom, v, C):
         C.add(v)
-        result = False
-        for u in self.adjacents(v):
-            if u == cameFrom:
-                pass
-            elif u in C:
-                result = True
-            else:
-                result |= self.hasCycleUtil(v, u, C)
-        return result
+        for u in self.adjacents(v) - {cameFrom}:
+            if u in C:
+                return True
+            elif self.hasCycleUtil(v, u, C):
+                return True
+        return False
 
     def hasCycle(self):
-        result = False
         graph = self
         Marked = set()
         while graph.Vertices != set():
             v = graph.anyVertex()
             Marked.add(v)
             for u in graph.adjacents(v):
-                result |= self.hasCycleUtil(v, u, Marked)
+                if self.hasCycleUtil(v, u, Marked):
+                    return True
             RemainingVertices = self.Vertices - Marked
             graph = Graph(RemainingVertices, self.Edges)
-        return result
+        return False
 
     def isTree(self):
         if not self.isConnected():
             return False
-        return self.hasCycle()
+        return not self.hasCycle()
 
 if __name__ == "__main__":
-    g = Graph(set(), set())
-    g.addVertex(1)
-    g.addVertex(2)
-    g.addVertex(3)
-    g.addVertex(4)
-    g.addVertex(5)
+    g = Graph({1,2,3,4,5}, set())
     g.connect(1, 2)
-    # g.connect(2, 3)
+    g.connect(2, 3)
     g.connect(4, 3)
     g.connect(3, 5)
     g.connect(5, 4)
