@@ -9,10 +9,10 @@ class Graph:
         return "V={0} | E={1}".format(self.Vertices, self.Edges)
 
     # Basic methods
-    def addVertex(self, v):
+    def add_vertex(self, v):
         self.Vertices.add(v)
 
-    def removeVertex(self, v):
+    def remove_vertex(self, v):
         self.Vertices.remove(v)
 
     def connect(self, v1, v2):
@@ -27,7 +27,7 @@ class Graph:
     def vertices(self):
         return self.Vertices
     
-    def anyVertex(self):
+    def any_vertex(self):
         return iter(self.Vertices).next()
 
     def successors(self, v):
@@ -43,61 +43,61 @@ class Graph:
         return len(self.adjacents(v))
 
     # Derived methods
-    def isRegular(self):
-        degree = self.degree(self.anyVertex())
+    def is_regular(self):
+        degree = self.degree(self.any_vertex())
         for v in self.Vertices:
             if self.degree(v) != degree:
                 return False
         return True
 
-    def isComplete(self):
+    def is_complete(self):
         for v in self.Vertices:
             if self.adjacents(v) != self.Vertices:
                 return False
         return True
 
-    def transitiveClosureUtil(self, v, reachable):
+    def transitive_closure_util(self, v, reachable):
         reachable.add(v)
         for u in self.adjacents(v):
             if u not in reachable:
-                reachable.union(self.transitiveClosureUtil(u, reachable))
+                reachable.union(self.transitive_closure_util(u, reachable))
         return reachable
 
-    def transitiveClosure(self, v):
-        return self.transitiveClosureUtil(v, set())
+    def transitive_closure(self, v):
+        return self.transitive_closure_util(v, set())
 
-    def isConnected(self):
+    def is_connected(self):
         for v in self.Vertices:
-            if self.transitiveClosure(v) != self.Vertices:
+            if self.transitive_closure(v) != self.Vertices:
                 return False
         return True
     
-    def hasCycleUtil(self, cameFrom, v, C):
+    def has_cycle_util(self, came_from, v, C):
         C.add(v)
-        for u in self.adjacents(v) - {cameFrom}:
+        for u in self.adjacents(v) - {came_from}:
             if u in C:
                 return True
-            elif self.hasCycleUtil(v, u, C):
+            elif self.has_cycle_util(v, u, C):
                 return True
         return False
 
-    def hasCycle(self):
+    def has_cycle(self):
         graph = self
         Marked = set()
         while graph.Vertices != set():
-            v = graph.anyVertex()
+            v = graph.any_vertex()
             Marked.add(v)
             for u in graph.adjacents(v):
-                if self.hasCycleUtil(v, u, Marked):
+                if self.has_cycle_util(v, u, Marked):
                     return True
-            RemainingVertices = self.Vertices - Marked
-            graph = Graph(RemainingVertices, self.Edges)
+            remaining_vertices = self.Vertices - Marked
+            graph = Graph(remaining_vertices, self.Edges)
         return False
 
-    def isTree(self):
-        if not self.isConnected():
+    def is_tree(self):
+        if not self.is_connected():
             return False
-        return not self.hasCycle()
+        return not self.has_cycle()
 
 if __name__ == "__main__":
     g = Graph({1,2,3,4,5}, set())
@@ -108,11 +108,11 @@ if __name__ == "__main__":
     g.connect(5, 4)
     # print(g)
     # print(g.successors(2), g.antecessors(2), g.adjacents(2))
-    print(g.transitiveClosure(2))
-    print(g.hasCycle())
-    print(g.isConnected())
-    print(g.isTree())
-    # g.removeVertex(2)
-    # g.removeVertex(3)
+    print(g.transitive_closure(2))
+    print(g.has_cycle())
+    print(g.is_connected())
+    print(g.is_tree())
+    # g.remove_vertex(2)
+    # g.remove_vertex(3)
     # g.disconnect(2, 3)
     # print(g)
