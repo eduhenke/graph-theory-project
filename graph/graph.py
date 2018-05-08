@@ -98,21 +98,3 @@ class Graph:
         if not self.is_connected():
             return False
         return not self.has_cycle()
-
-if __name__ == "__main__":
-    g = Graph({1,2,3,4,5}, set())
-    g.connect(1, 2)
-    g.connect(2, 3)
-    g.connect(4, 3)
-    g.connect(3, 5)
-    g.connect(5, 4)
-    # print(g)
-    # print(g.successors(2), g.antecessors(2), g.adjacents(2))
-    print(g.transitive_closure(2))
-    print(g.has_cycle())
-    print(g.is_connected())
-    print(g.is_tree())
-    # g.remove_vertex(2)
-    # g.remove_vertex(3)
-    # g.disconnect(2, 3)
-    # print(g)
