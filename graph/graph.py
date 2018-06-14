@@ -120,3 +120,19 @@ class Graph:
         if not self.is_connected():
             return False
         return not self.has_cycle()
+
+    def topological_sorting(self):
+        G = self
+        l = []
+        s = G.sources()
+        while s != set():
+            v = s.pop()
+            l.append(v)
+            for n in G.successors(v):
+                G.remove_edge(v, n)
+                if G.in_degree(n) == 0:
+                    s.add(n)
+        if len(G.Edges) > 0:
+            raise TypeError("Graph is not DAG, has at least one cycle")
+        else:
+            return l
