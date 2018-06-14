@@ -12,8 +12,18 @@ class Graph:
     def add_vertex(self, v):
         self.Vertices.add(v)
 
-    def remove_vertex(self, v):
+    def remove_vertex(self, v): # TODO: improve efficiency :(
         self.Vertices.remove(v)
+        for n in self.successors(v):
+            self.remove_edge(v, n)
+        for n in self.antecessors(v):
+            self.remove_edge(n, v)
+
+    def add_edge(self, a, b):
+        self.Edges.add((a, b))
+
+    def remove_edge(self, a, b):
+        self.Edges.remove((a, b))
 
     def connect(self, v1, v2):
         self.Edges.add((v1, v2))
