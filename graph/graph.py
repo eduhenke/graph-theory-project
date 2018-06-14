@@ -1,8 +1,10 @@
 # Graph implementation as per:
 # http://www.inf.ufsc.br/grafos/represen/algoritmos/grafo.html
 class Graph:
-    def __init__(self, V, E):
+    def __init__(self, V, E, directed=True):
         self.Vertices = V
+        if not directed: # duplicate
+            E = {(b, a) for (a, b) in E}.union(E)
         self.Edges = E
         
     def __str__(self):
@@ -96,7 +98,7 @@ class Graph:
     
     def has_cycle_util(self, came_from, v, C):
         C.add(v)
-        for u in self.adjacents(v) - {came_from}:
+        for u in self.successors(v) - {came_from}:
             if u in C:
                 return True
             elif self.has_cycle_util(v, u, C):
@@ -109,11 +111,11 @@ class Graph:
         while graph.Vertices != set():
             v = graph.any_vertex()
             Marked.add(v)
-            for u in graph.adjacents(v):
-                if self.has_cycle_util(v, u, Marked):
+            for u in graph.successors(v):
+                if u not in Marked and graph.has_cycle_util(v, u, Marked):
                     return True
-            remaining_vertices = self.Vertices - Marked
-            graph = Graph(remaining_vertices, self.Edges)
+            remaining_vertices = graph.Vertices - Marked
+            graph = Graph(remaining_vertices, graph.Edges)
         return False
 
     def is_tree(self):
