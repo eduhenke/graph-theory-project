@@ -21,12 +21,6 @@ class Graph:
         for n in self.antecessors(v):   # O(m)
             self.disconnect(n, v)       # O(1)
 
-    def add_edge(self, a, b):
-        self.Edges.add((a, b))
-
-    def remove_edge(self, a, b):
-        self.Edges.remove((a, b))
-
     def connect(self, v1, v2): # O(1)
         self.Edges.add((v1, v2))
 
@@ -131,7 +125,7 @@ class Graph:
             v = s.pop()
             l.append(v)
             for n in G.successors(v):
-                G.remove_edge(v, n)
+                G.disconnect(v, n)
                 if G.in_degree(n) == 0:
                     s.add(n)
         if len(G.Edges) > 0:
