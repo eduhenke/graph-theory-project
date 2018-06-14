@@ -39,8 +39,20 @@ class Graph:
     def adjacents(self, v):
         return self.successors(v).union(self.antecessors(v))
     
+    def in_degree(self, v):
+        return len(self.antecessors(v))
+
+    def out_degree(self, v):
+        return len(self.successors(v))
+
     def degree(self, v):
         return len(self.adjacents(v))
+
+    def sources(self):
+        return {v for v in self.Vertices if self.in_degree(v) == 0}
+
+    def sinks(self):
+        return {v for v in self.Vertices if self.out_degree(v) == 0}
 
     # Derived methods
     def is_regular(self):
