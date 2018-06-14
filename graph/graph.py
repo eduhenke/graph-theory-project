@@ -11,15 +11,15 @@ class Graph:
         return "V={0} | E={1}".format(self.Vertices, self.Edges)
 
     # Basic methods
-    def add_vertex(self, v):
+    def add_vertex(self, v): # O(1)
         self.Vertices.add(v)
 
-    def remove_vertex(self, v): # TODO: improve efficiency :(
-        self.Vertices.remove(v)
-        for n in self.successors(v):
-            self.remove_edge(v, n)
-        for n in self.antecessors(v):
-            self.remove_edge(n, v)
+    def remove_vertex(self, v): # O(m)
+        self.Vertices.remove(v)         # O(1)
+        for n in self.successors(v):    # O(m)
+            self.disconnect(v, n)       # O(1)
+        for n in self.antecessors(v):   # O(m)
+            self.disconnect(n, v)       # O(1)
 
     def add_edge(self, a, b):
         self.Edges.add((a, b))
@@ -27,43 +27,43 @@ class Graph:
     def remove_edge(self, a, b):
         self.Edges.remove((a, b))
 
-    def connect(self, v1, v2):
+    def connect(self, v1, v2): # O(1)
         self.Edges.add((v1, v2))
 
-    def disconnect(self, v1, v2):
+    def disconnect(self, v1, v2): # O(1)
         self.Edges.remove((v1, v2))
     
-    def order(self):
+    def order(self): # O(1)
         return len(self.Vertices)
 
-    def vertices(self):
+    def vertices(self): # O(1)
         return self.Vertices
     
-    def any_vertex(self):
+    def any_vertex(self): # probably O(1) :P
         return iter(self.Vertices).next()
 
-    def successors(self, v):
+    def successors(self, v): # O(m)
         return {w for (u, w) in self.Edges if u == v}
 
-    def antecessors(self, v):
+    def antecessors(self, v): # O(m)
         return {u for (u, w) in self.Edges if w == v}
 
-    def adjacents(self, v):
+    def adjacents(self, v): # O(m)
         return self.successors(v).union(self.antecessors(v))
     
-    def in_degree(self, v):
+    def in_degree(self, v): # O(m)
         return len(self.antecessors(v))
 
-    def out_degree(self, v):
+    def out_degree(self, v): # O(m)
         return len(self.successors(v))
 
-    def degree(self, v):
+    def degree(self, v): # O(m)
         return len(self.adjacents(v))
 
-    def sources(self):
+    def sources(self): # O(n*m)
         return {v for v in self.Vertices if self.in_degree(v) == 0}
 
-    def sinks(self):
+    def sinks(self): # O(n*m)
         return {v for v in self.Vertices if self.out_degree(v) == 0}
 
     # Derived methods
