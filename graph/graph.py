@@ -1,31 +1,64 @@
 # Graph implementation as per:
 # http://www.inf.ufsc.br/grafos/represen/algoritmos/grafo.html
+from copy import deepcopy
+
 class Graph:
-    def __init__(self, V, E, directed=True):
-        self.Vertices = V
+    def __init__(self, V=set(), E=set(), directed=True):
+        self.Vertices = set()
+        self.Edges = set()
+        self._successors = {}
+        self._antecessors = {}
+        self._directed = directed
+
+        for v in V:
+            self.add_vertex(v)
+
         if not directed: # duplicate
             E = {(b, a) for (a, b) in E}.union(E)
-        self.Edges = E
-        
+        for (a, b) in E:
+            self.connect(a, b)
+
     def __str__(self):
         return "V={0} | E={1}".format(self.Vertices, self.Edges)
 
     # Basic methods
     def add_vertex(self, v): # O(1)
         self.Vertices.add(v)
+        self._successors[v] = set()
+        self._antecessors[v] = set()
 
-    def remove_vertex(self, v): # O(m)
-        self.Vertices.remove(v)         # O(1)
-        for n in self.successors(v):    # O(m)
-            self.disconnect(v, n)       # O(1)
-        for n in self.antecessors(v):   # O(m)
-            self.disconnect(n, v)       # O(1)
+    def add_vertices(self, *vs):
+        for v in vs:
+            self.add_vertex(v)
+
+    def remove_vertex(self, v): # O(m/n)
+        self.Vertices.remove(v)                # O(1)
+        for n in self.successors(v).copy():    # O(m/n)
+            self.disconnect(v, n)              # O(1)
+        for n in self.antecessors(v).copy():   # O(m/n)
+            self.disconnect(n, v)              # O(1)
+
+    def remove_vertices(self, *vs):
+        for v in vs:
+            self.remove_vertex(v)
 
     def connect(self, v1, v2): # O(1)
         self.Edges.add((v1, v2))
+        self._successors[v1].add(v2)
+        self._antecessors[v2].add(v1)
+        if not self._directed:
+            self.Edges.add((v2, v1))
+            self._successors[v2].add(v1)
+            self._antecessors[v1].add(v2)
 
     def disconnect(self, v1, v2): # O(1)
         self.Edges.remove((v1, v2))
+        self._successors[v1].remove(v2)
+        self._antecessors[v2].remove(v1)
+        if not self._directed:
+            self.Edges.remove((v2, v1))
+            self._successors[v2].remove(v1)
+            self._antecessors[v1].remove(v2)
     
     def order(self): # O(1)
         return len(self.Vertices)
@@ -36,28 +69,28 @@ class Graph:
     def any_vertex(self): # probably O(1) :P
         return iter(self.Vertices).next()
 
-    def successors(self, v): # O(m)
-        return {w for (u, w) in self.Edges if u == v}
+    def successors(self, v): # O(1)
+        return self._successors[v]
 
-    def antecessors(self, v): # O(m)
-        return {u for (u, w) in self.Edges if w == v}
+    def antecessors(self, v): # O(1)
+        return self._antecessors[v]
 
-    def adjacents(self, v): # O(m)
+    def adjacents(self, v): # O(1)
         return self.successors(v).union(self.antecessors(v))
     
-    def in_degree(self, v): # O(m)
+    def in_degree(self, v): # O(1)
         return len(self.antecessors(v))
 
-    def out_degree(self, v): # O(m)
+    def out_degree(self, v): # O(1)
         return len(self.successors(v))
 
-    def degree(self, v): # O(m)
-        return len(self.adjacents(v))
+    def degree(self, v): # O(1)
+        return self.in_degree(v) + self.out_degree(v)
 
-    def sources(self): # O(n*m)
+    def sources(self): # O(n)
         return {v for v in self.Vertices if self.in_degree(v) == 0}
 
-    def sinks(self): # O(n*m)
+    def sinks(self): # O(n)
         return {v for v in self.Vertices if self.out_degree(v) == 0}
 
     # Derived methods
@@ -100,7 +133,7 @@ class Graph:
         return False
 
     def has_cycle(self):
-        graph = self
+        graph = deepcopy(self)
         Marked = set()
         while graph.Vertices != set():
             v = graph.any_vertex()
@@ -108,8 +141,8 @@ class Graph:
             for u in graph.successors(v):
                 if u not in Marked and graph.has_cycle_util(v, u, Marked):
                     return True
-            remaining_vertices = graph.Vertices - Marked
-            graph = Graph(remaining_vertices, graph.Edges)
+            to_remove = Marked.intersection(graph.Vertices)
+            graph.remove_vertices(*to_remove)
         return False
 
     def is_tree(self):
@@ -124,7 +157,7 @@ class Graph:
         while s != set():
             v = s.pop()
             l.append(v)
-            for n in G.successors(v):
+            for n in G.successors(v).copy():
                 G.disconnect(v, n)
                 if G.in_degree(n) == 0:
                     s.add(n)
