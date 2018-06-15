@@ -13,8 +13,6 @@ class Graph:
         for v in V:
             self.add_vertex(v)
 
-        if not directed: # duplicate
-            E = {(b, a) for (a, b) in E}.union(E)
         for (a, b) in E:
             self.connect(a, b)
 
@@ -27,8 +25,8 @@ class Graph:
         self._successors[v] = set()
         self._antecessors[v] = set()
 
-    def add_vertices(self, *vs):
-        for v in vs:
+    def add_vertices(self, *V):
+        for v in V:
             self.add_vertex(v)
 
     def remove_vertex(self, v): # O(m/n)
@@ -38,8 +36,8 @@ class Graph:
         for n in self.antecessors(v).copy():   # O(m/n)
             self.disconnect(n, v)              # O(1)
 
-    def remove_vertices(self, *vs):
-        for v in vs:
+    def remove_vertices(self, *V):
+        for v in V:
             self.remove_vertex(v)
 
     def connect(self, v1, v2): # O(1)
