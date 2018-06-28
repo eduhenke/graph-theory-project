@@ -57,13 +57,13 @@ class Graph:
             self.Edges.remove((v2, v1))
             self._successors[v2].remove(v1)
             self._antecessors[v1].remove(v2)
-    
+
     def order(self): # O(1)
         return len(self.Vertices)
 
     def vertices(self): # O(1)
         return self.Vertices
-    
+
     def any_vertex(self): # probably O(1) :P
         return iter(self.Vertices).next()
 
@@ -75,7 +75,7 @@ class Graph:
 
     def adjacents(self, v): # O(1)
         return self.successors(v).union(self.antecessors(v))
-    
+
     def in_degree(self, v): # O(1)
         return len(self.antecessors(v))
 
@@ -120,7 +120,7 @@ class Graph:
             if self.transitive_closure(v) != self.Vertices:
                 return False
         return True
-    
+
     def has_cycle_util(self, came_from, v, C):
         C.add(v)
         for u in self.successors(v) - {came_from}:
