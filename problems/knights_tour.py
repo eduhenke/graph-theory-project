@@ -1,36 +1,20 @@
-# obter uma ordenação topológica das disciplinas do currículo
-# considerando as disciplinas obrigatórias que ainda lhe resta cursar, distribuir
-# estas disciplinas ao longo de semestres subsequentes (montar um plano para cursá-las),
-# respeitando os pré-requisitos e o limite de carga horária que pode ser cursada num período.
+# Knight's tour model
+# https://en.wikipedia.org/wiki/Knight%27s_tour
 
 import sys
 sys.path.append(sys.path[0] + "/..")
 from graph.graph import Graph
 
-class Course:
-    def __init__(self, name, workload, requisite):
-        self.name = name
-        self.workload = workload
-        self.requisite = requisite
-    def depends(self, other):
-        return self.requisite == other.name
+# logic from http://www.inf.ufsc.br/grafos/temas/hamiltoniano/cavalo.htm
+def horse_movement(l_a, c_a, l_b, c_b):
+    return all([
+        (abs(l_a - l_b) + abs(c_a - c_b)) == 3,
+        l_a != l_b,
+        c_a != c_b
+    ])
 
-CCO_COURSES = [
-  Course("Formais", 72, ''),
-  Course("Compiladores", 72, "Formais"),
-  Course("Sistemas Operacionais", 72, ''),
-  Course("Sistemas Operacionais II", 72, "Sistemas Operacionais"),
-  Course("Computação Gráfica", 72, "Cálculo II"),
-  Course("Cálculo II", 72, ""),
-  Course("Computação Distribuida", 72, "Sistemas Operacionais"),
-  Course("Cálculo Numérico", 72, "Cálculo II"),
-]
-
-MAX_WORKLOAD = 216
-
-V = set(COMPUTER_SCIENCE_COURSES)
-E = {(v, w) for v in V for w in V if v.requisite == w.name }
+V = {(l,c) for l in range(8) for c in range(8)}
+E = {((l_a, c_a), (l_b, c_b)) for (l_a, c_a) in V for (l_b, c_b) in V if horse_movement(l_a, c_a, l_b, c_b)}
 
 g = Graph(V, E)
-sorting = g.topological_sorting() # <---------------------------------------------------------------------------
 print(g)
