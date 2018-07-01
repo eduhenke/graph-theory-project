@@ -1,8 +1,8 @@
 # coding=utf-8
 # obter uma ordenação topológica das disciplinas do currículo
 # considerando as disciplinas obrigatórias que ainda lhe resta cursar, distribuir
-#estas disciplinas ao longo de semestres subsequentes (montar um plano para cursá-las),
-#respeitando os pré-requisitos e o limite de carga horária que pode ser cursada num período.
+# estas disciplinas ao longo de semestres subsequentes (montar um plano para cursá-las),
+# respeitando os pré-requisitos e o limite de carga horária que pode ser cursada num período.
 
 import sys
 sys.path.append(sys.path[0] + "/..")
@@ -27,27 +27,35 @@ CCO_COURSES = [
 
 MAX_WORKLOAD = 216
 
+# Criação do Grafo de acordo com o modelo proposto em aula:
 V = set(CCO_COURSES)
 E = {(x, y) for x in V for y in V if x.requisite == y.name }
-
 g = Graph(V, E)
 
+# Ordenação Topológica das Disciplinas:
 sorting = g.topological_sorting()
-for x in sorting:
-  print(x.name)
+print("* Ordenação Topológica:")
+for v in sorting:
+  print(v.name)
 
+
+# Distribuição das Disciplinas:
 temp_workload = 0
 semester_courses = []
 semesters = []
 
-for x in reversed(sorting):
-  temp_workload += x.workload
-  semester_courses.append(x.name)
+while len(sorting) != 0:
+  for x in sorting:
+    temp_workload += x.workload
+    semester_courses.append(x.name)
 
-  if temp_workload >= MAX_WORKLOAD:
-    semesters.append(semester_courses)
-    print(semester_courses)
-    semester_courses = []
-    temp_workload = 0
+    if temp_workload >= MAX_WORKLOAD:
+      semesters.append(semester_courses)
+      semester_courses = []
+      temp_workload = 0
+      sorting.pop(0)
 
+print("* Planejamento de Semestre: ")
+for s in semesters:
+  print(s)
 
